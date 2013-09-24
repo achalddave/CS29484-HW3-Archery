@@ -1,0 +1,10 @@
+$bg : #111;
+$fg : #eee;
+
+body {
+    font-family : "Segoe UI", sans-serif;
+    background : $bg;
+    color : $fg;
+}
+
+h1,h2,h3 { font-weight : 200; }

@@ -1,0 +1,21 @@
+{
+  "name": "CS294-84-HW3-Archery",
+  "version": "0.0.0",
+  "authors": [
+    "Achal Dave <achalddave@live.com>"
+  ],
+  "description": "CS294-84 HW3: Archery game",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.0.3",
+    "raphael": "~2.1.2"
+  }
+}
