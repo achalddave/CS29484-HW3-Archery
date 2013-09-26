@@ -23,7 +23,8 @@ app.use(app.router);
 app.use(sass.middleware({
   src:   path.join(__dirname, 'public'),
   dest:  path.join(__dirname, 'public'),
-  debug: true
+  debug: true,
+  force : true /* https://github.com/andrew/node-sass/issues/157 */
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
