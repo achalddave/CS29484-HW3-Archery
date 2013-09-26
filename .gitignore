@@ -3,3 +3,5 @@ node_modules
 
 # bower components, run bower install
 public/javascripts/lib
+
+*css
