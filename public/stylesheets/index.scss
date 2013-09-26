@@ -1,10 +1,15 @@
-$bg : #111;
-$fg : #eee;
+@import "common.scss";
 
-body {
-    font-family : "Segoe UI", sans-serif;
-    background : $bg;
-    color : $fg;
+#title {
+  text-align : center;
 }
 
-h1,h2,h3 { font-weight : 200; }
+#game {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+
+  width  : 800px;
+  height : 500px;
+  box-shadow : 0px 0px 20px 2px darken($bg, 20%);
+}
