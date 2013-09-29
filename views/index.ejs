@@ -3,12 +3,27 @@
   <head>
     <title><%= title %></title>
     <link rel="stylesheet" href="/stylesheets/index.css" />
-    <script src="javascripts/lib/svg.js/dist/svg.min.js"></script>
+    <script src="javascripts/lib/svg.js/dist/svg.js"></script>
     <script src="javascripts/lib/jquery/jquery.min.js"></script>
     <script src="javascripts/index.js"></script>
   </head>
   <body>
     <h1 id="title"><%= title %></h1>
     <div id="game"></div>
+    <div id="controls">
+      <h2>Controls</h2>
+      <div class="control">
+        <label for="target-pos">Target</label>
+        <input type="range" id="target-pos"/>
+      </div>
+      <div class="control">
+        <label for="draw-angle">Draw Angle</label>
+        <input type="range" id="draw-angle"/>
+      </div>
+      <div class="control">
+        <label for="draw-force">Draw force</label>
+        <input type="range" id="draw-force"/>
+      </div>
+    </div>
   </body>
 </html>

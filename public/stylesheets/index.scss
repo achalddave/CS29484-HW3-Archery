@@ -13,3 +13,27 @@
   height : 500px;
   box-shadow : 0px 0px 20px 2px darken($bg, 20%);
 }
+
+#controls {
+  -moz-box-sizing : border-box;
+  box-sizing : border-box;
+  width : 200px;
+  height : 400px;
+  padding : 10px;
+  box-shadow : 0px 0px 20px 2px #ddd;
+
+  h2 {
+    text-align : center;
+    margin : 0 0 1em 0;
+    padding : 0;
+  }
+
+  .control {
+    label { display : block; padding : 10px 0;}
+    text-align : center;
+
+    #draw-force {
+    }
+
+  }
+}
