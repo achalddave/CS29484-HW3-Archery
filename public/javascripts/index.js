@@ -127,11 +127,19 @@ $(function() {
       x1 : slots[i].center,
       x2 : slots[i].center
     });
+    var p1 = (slots[i].center - 5) + ',' + arrowEnd;
+    var p2 = (slots[i].center)     + ',' + (arrowEnd-10);
+    var p3 = (slots[i].center + 5) + ',' + arrowEnd;
+    arrowHead.attr({
+      points : p1 + ' ' + p2 + ' ' + p3
+    });
   }
 
   var defaultSlot = Math.round(slots.length/2-0.5);
   var target = svg.target(40);
-  var arrow  = svg.line(0,h,0,h-(h - slots[0].bottom)/2).stroke({width:5});
+  var arrowEnd = h - (h - slots[0].bottom)/4;
+  var arrow  = svg.line(0,h,0,arrowEnd).stroke({width:2});
+  var arrowHead = svg.polygon('0,0 0,0 0,0').fill('none').stroke({ width: 1 });
   updateSlot(defaultSlot);
 
   $('#target-pos').attr({ min : 0, max : slots.length, step: 1 });
