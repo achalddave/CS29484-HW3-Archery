@@ -110,7 +110,10 @@ SVG.extend(SVG.Arrow, {
     if (h == null) { h = this.h; } else { this.h = h; }
 
     var cx = this.arrowLine.attr('x2'), by = this.arrowLine.attr('y2');
-    this.arrowHead.plot([[cx - w/2, by], [cx, by-h], [cx + w/2, by]]);
+    this.arrowHead.plot([[cx - w/2, by+(h/3)],
+                         [cx, by-(2*h/3)],
+                         [cx + w/2, by+(h/3)],
+                         [cx, by]]);
     return this;
   }
 });
