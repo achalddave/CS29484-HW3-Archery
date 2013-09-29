@@ -84,8 +84,14 @@ SVG.extend(SVG.Target, {
 SVG.Arrow = function(parent) {
   this.constructor.call(this, SVG.create('arrow'));
 
+  this.arrowGroup = parent.group();
   this.arrowLine = parent.line(0,0,0,0).stroke({width:2});
-  this.arrowHead = parent.polygon('').fill('black');
+  this.arrowHead = parent.polygon('').stroke('black').fill('none');
+  this.arrowHead1 = parent.polyline('').stroke('black').fill('none');
+  this.arrowHead2 = parent.polyline('').stroke('black').fill('none');
+  this.arrowHead3 = parent.polyline('').stroke('black').fill('none');
+  this.arrowGroup.add(this.arrowLine).add(this.arrowHead).add(this.arrowHead1)
+                 .add(this.arrowHead2).add(this.arrowHead3);
 }
 
 SVG.Arrow.prototype = new SVG.Shape();
@@ -114,6 +120,18 @@ SVG.extend(SVG.Arrow, {
                          [cx, by-(2*h/3)],
                          [cx + w/2, by+(h/3)],
                          [cx, by]]);
+    this.arrowHead1.plot([[cx-2*w/5, by+(2*h/3)],
+                          [cx, by+(h/3)],
+                          [cx+2*w/5, by+(2*h/3)]
+                          ]);
+    this.arrowHead2.plot([[cx-w/3, by+(h)],
+                          [cx, by+(2*h/3)],
+                          [cx+w/3, by+(h)]
+                          ]);
+    this.arrowHead3.plot([[cx-w/4, by+(h)],
+                          [cx, by+(2*h/3)],
+                          [cx+w/4, by+(h)]
+                          ]);
     return this;
   }
 });
