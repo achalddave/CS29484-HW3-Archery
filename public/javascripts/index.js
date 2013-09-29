@@ -106,7 +106,7 @@ $(function() {
     updateArrow();
   });
 
-  var aimedCircle = svg.circle(10).fill('red').center(-100,-100);
+  var aimedCircle = svg.circle(10).fill('#AD1515').stroke({color: '#eee', width: 3}).center(-100,-100);
   $('#draw-angle').change(function() {
     var angle = $(this).val();
     // perfect angle: 50
