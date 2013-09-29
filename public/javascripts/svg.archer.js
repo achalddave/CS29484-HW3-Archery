@@ -22,7 +22,7 @@ SVG.Target = function(parent) {
   this.gradientRing = parent.circle(0).attr({fill : gradient});
 }
 
-// Inherit from SVG.Container
+// Inherit from SVG.Shape
 SVG.Target.prototype = new SVG.Shape();
 
 ['cx','cy'].forEach(function(prop) {
