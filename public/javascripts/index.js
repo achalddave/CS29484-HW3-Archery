@@ -16,7 +16,7 @@ SVG.Target = function(parent) {
 
   var gradient = parent.gradient('radial', function(stop) {
     stop.at({ offset: 0, color: '#eee', opacity: 0.8 })
-    stop.at({ offset: 1, color: '#000', opacity: 0.3 })
+    stop.at({ offset: 1, color: '#000', opacity: 0.2 })
   });
   gradient.from(0.3,0.3).to(0.3,0.3).radius(0.3);
   this.gradientRing = parent.circle(0).attr({fill : gradient});
@@ -63,7 +63,7 @@ SVG.extend(SVG.Target, {
     var currDiameter = 2*r;
     var step = 2*r / this.colors.length;
 
-    this.stand.size(.5*r, 1.3*r);
+    this.stand.size(1.3*r, 1.3*r);
     this.gradientRing.size(2*r, 2*r);
     this.repositionStand();
 
@@ -144,6 +144,7 @@ $(function() {
     var p2 = (slots[slot].center)     + ',' + (arrowEnd-10);
     var p3 = (slots[slot].center + 7) + ',' + arrowEnd;
     arrow.attr({
+      y1: arrowStart, 
       y2: arrowEnd
     })
     arrowHead.attr({
@@ -159,10 +160,12 @@ $(function() {
   var currSlot = defaultSlot;
   var origArrowEnd = h - (h - slots[0].bottom)/2;
   var arrowEnd = origArrowEnd;
+  var arrowStart = h;
+  var arrowLength = origArrowEnd - arrowStart;
   var forceLineY = h - (h - slots[0].bottom)/4;
 
   var target = svg.target(40);
-  var arrow  = svg.line(0,h,0,arrowEnd).stroke({width:2});
+  var arrow  = svg.line(0,arrowStart,0,arrowEnd).stroke({width:2});
   var arrowHead = svg.polygon('').fill('none').stroke({ width: 1 });
   var forceLine = svg.line(0,forceLineY,0,forceLineY).stroke({width:5, color: '#f00'});
   updateSlot(defaultSlot);
@@ -181,9 +184,19 @@ $(function() {
         console.log("shooting");
         if (arrowEnd < target.cy()+5) {
           clearTimeout(timeout);
+          svg.text("Congrats! You hit perfectly!")
+            .x(w/2)
+            .y(h/8)
+            .font({
+              size: 40,
+              anchor: 'middle',
+              weight:'lighter',
+              family: 'Segoe UI'
+            });
           return;
         }
         arrowEnd -= 2; 
+        arrowStart = arrowEnd - arrowLength;
         updateSlot(currSlot);
         timeout = setTimeout(shootAnimator,1);
       }
@@ -192,7 +205,7 @@ $(function() {
     updateArrow(currSlot);
   });
 
-  var aimedCircle = svg.circle(10).fill('red');
+  var aimedCircle = svg.circle(10).fill('red').center(-100,-100);
   $('#draw-angle').change(function() {
     var angle = $(this).val();
     // perfect angle: 50
