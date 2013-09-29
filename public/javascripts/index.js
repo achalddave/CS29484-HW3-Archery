@@ -1,7 +1,7 @@
 // config
 var config = {
   numSlots : 9,
-  debug : false
+  debug : true
 }
 $(function() {
   var svg = SVG('game');
@@ -63,6 +63,8 @@ $(function() {
   var arrow  = svg.arrow(0,h,0,arrowEnd);
   var forceLine = svg.line(0,0,0,0).plot(0,forceLineY,0,forceLineY).stroke({width:5, color: '#f00'});
   updateSlot(currSlot);
+
+  if (config.debug) window.target = target;
 
   $('#target-pos').attr({ min : 0, max : slots.length, step: 1 });
   $('#target-pos').change(function() {
