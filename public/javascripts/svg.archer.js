@@ -87,15 +87,31 @@ SVG.Arrow = function(parent) {
   this.arrowHead = parent.polygon('').fill('black');
 }
 
+SVG.Arrow.prototype = new SVG.Shape;
+
+SVG.extend(SVG.Arrow, {
+  plot : function(x1, y1, x2, y2) {
+    this.arrowLine.attr({
+      x1 : x1,
+      y1 : y1,
+      x2 : x2,
+      y2 : y2
+    });
+  },
+  head : function(w, h) {
+    var cx = this.arrowLine.attr('x2'), by = this.arrowLine.attr('y2');
+    this.arrowHead.plot([[cx - w/2, by], [cx, by+h], [cx + w/2, by]]);
+  }
+});
+
 SVG.extend(SVG.Container, {
   target : function(r) {
     // ring colors from outside in
     return this.put(new SVG.Target(this)).size(r).move(0,0);
   },
-  arrow : function() {
-    return this.put(new SVG.Arrow(this)).attr({
-      x1: 0, y1: 0, x2: 0, y2: 0
-    });
+  arrow : function(x1, y1, x2, y2) {
+    this.put(new SVG.Arrow()).plot(x1, y1, x2, y2).head(5,5);
+    return this;
   }
 });
 
