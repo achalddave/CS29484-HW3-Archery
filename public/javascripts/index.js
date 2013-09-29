@@ -45,20 +45,10 @@ $(function() {
   }
 
   function updateArrow(slot) {
-    arrow.attr({
-      x1 : slots[slot].center,
-      x2 : slots[slot].center
-    });
+    arrow.plot(slots[slot].center, arrowStart, slots[slot].center, arrowEnd);
     var p1 = (slots[slot].center - 7) + ',' + arrowEnd;
     var p2 = (slots[slot].center)     + ',' + (arrowEnd-10);
     var p3 = (slots[slot].center + 7) + ',' + arrowEnd;
-    arrow.attr({
-      y1: arrowStart, 
-      y2: arrowEnd
-    })
-    arrowHead.attr({
-      points : p1 + ' ' + p2 + ' ' + p3
-    });
     forceLine.attr({
       x1 : slots[slot].center - 50,
       x2 : slots[slot].center + 50
@@ -74,9 +64,8 @@ $(function() {
   var forceLineY = h - (h - slots[0].bottom)/4;
 
   var target = svg.target(40);
-  var arrow  = svg.line(0,arrowStart,0,arrowEnd).stroke({width:2});
-  var arrowHead = svg.polygon('').fill('none').stroke({ width: 1 });
-  var forceLine = svg.line(0,forceLineY,0,forceLineY).stroke({width:5, color: '#f00'});
+  var arrow  = svg.arrow(0,arrowStart,0,arrowEnd);
+  var forceLine = svg.line(0,0,0,0).plot(0,forceLineY,0,forceLineY).stroke({width:5, color: '#f00'});
   updateSlot(defaultSlot);
 
   $('#target-pos').attr({ min : 0, max : slots.length, step: 1 });
@@ -90,7 +79,6 @@ $(function() {
       // shoot arrow
       var timeout;
       var shootAnimator = function() {
-        console.log("shooting");
         if (arrowEnd < target.cy()+5) {
           clearTimeout(timeout);
           svg.text("Congrats! You hit perfectly!")

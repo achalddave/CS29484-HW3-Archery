@@ -45,7 +45,6 @@ SVG.Target.prototype = new SVG.Shape();
     } else {
       var cProp = 'c' + prop;
       this[cProp](val + this.radius());
-      console.log(this[cProp]());
       return this;
     }
   }
@@ -83,24 +82,36 @@ SVG.extend(SVG.Target, {
 });
 
 SVG.Arrow = function(parent) {
+  this.constructor.call(this, SVG.create('arrow'));
+
   this.arrowLine = parent.line(0,0,0,0).stroke({width:2});
   this.arrowHead = parent.polygon('').fill('black');
 }
 
-SVG.Arrow.prototype = new SVG.Shape;
+SVG.Arrow.prototype = new SVG.Shape();
 
 SVG.extend(SVG.Arrow, {
   plot : function(x1, y1, x2, y2) {
+    x1 = x1 == null ? this.arrowLine.attr('x1') : x1;
+    y1 = y1 == null ? this.arrowLine.attr('y1') : y1;
+    x2 = x2 == null ? this.arrowLine.attr('x2') : x2;
+    y2 = y2 == null ? this.arrowLine.attr('y2') : y2;
     this.arrowLine.attr({
       x1 : x1,
       y1 : y1,
       x2 : x2,
       y2 : y2
     });
+    this.head();
+    return this;
   },
   head : function(w, h) {
+    if (w == null) { w = this.w; } else { this.w = w; }
+    if (h == null) { h = this.h; } else { this.h = h; }
+
     var cx = this.arrowLine.attr('x2'), by = this.arrowLine.attr('y2');
-    this.arrowHead.plot([[cx - w/2, by], [cx, by+h], [cx + w/2, by]]);
+    this.arrowHead.plot([[cx - w/2, by], [cx, by-h], [cx + w/2, by]]);
+    return this;
   }
 });
 
@@ -110,8 +121,7 @@ SVG.extend(SVG.Container, {
     return this.put(new SVG.Target(this)).size(r).move(0,0);
   },
   arrow : function(x1, y1, x2, y2) {
-    this.put(new SVG.Arrow()).plot(x1, y1, x2, y2).head(5,5);
-    return this;
+    return this.put(new SVG.Arrow(this)).plot(x1, y1, x2, y2).head(10,10);
   }
 });
 
