@@ -40,9 +40,14 @@ SVG.Target.prototype = new SVG.Shape();
 
 ['x','y'].forEach(function(prop) {
   SVG.Target.prototype[prop] = function(val) {
-    var rProp = 'r' + prop, cProp = 'c' + prop;
-    this[cProp](val + this.gradientRing.attr(rProp));
-    return this;
+    if (val == null) {
+      return this.gradientRing[prop]();
+    } else {
+      var cProp = 'c' + prop;
+      this[cProp](val + this.radius());
+      console.log(this[cProp]());
+      return this;
+    }
   }
 });
 
@@ -69,6 +74,9 @@ SVG.extend(SVG.Target, {
     });
     return this;
   },
+  radius: function() {
+    return this.gradientRing.attr('rx');
+  },
   placeGround: function(cx, by) {
     return this.cx(cx).y(by - this.stand.attr('height') - this.gradientRing.attr('ry'));
   }
@@ -84,7 +92,7 @@ SVG.extend(SVG.Container, {
 // config
 var config = {
   numSlots : 9,
-  debug : true
+  debug : false
 }
 $(function() {
   var svg = SVG('game');
@@ -122,29 +130,75 @@ $(function() {
   }
 
   function updateSlot(i) {
+    currSlot = i;
     target.placeGround(slots[i].center, slots[i].bottom);
+    updateArrow(i);
+  }
+
+  function updateArrow(slot) {
     arrow.attr({
-      x1 : slots[i].center,
-      x2 : slots[i].center
+      x1 : slots[slot].center,
+      x2 : slots[slot].center
     });
-    var p1 = (slots[i].center - 5) + ',' + arrowEnd;
-    var p2 = (slots[i].center)     + ',' + (arrowEnd-10);
-    var p3 = (slots[i].center + 5) + ',' + arrowEnd;
+    var p1 = (slots[slot].center - 7) + ',' + arrowEnd;
+    var p2 = (slots[slot].center)     + ',' + (arrowEnd-10);
+    var p3 = (slots[slot].center + 7) + ',' + arrowEnd;
+    arrow.attr({
+      y2: arrowEnd
+    })
     arrowHead.attr({
       points : p1 + ' ' + p2 + ' ' + p3
     });
+    forceLine.attr({
+      x1 : slots[slot].center - 50,
+      x2 : slots[slot].center + 50
+    })
   }
 
   var defaultSlot = Math.round(slots.length/2-0.5);
+  var currSlot = defaultSlot;
+  var origArrowEnd = h - (h - slots[0].bottom)/2;
+  var arrowEnd = origArrowEnd;
+  var forceLineY = h - (h - slots[0].bottom)/4;
+
   var target = svg.target(40);
-  var arrowEnd = h - (h - slots[0].bottom)/4;
   var arrow  = svg.line(0,h,0,arrowEnd).stroke({width:2});
-  var arrowHead = svg.polygon('0,0 0,0 0,0').fill('none').stroke({ width: 1 });
+  var arrowHead = svg.polygon('').fill('none').stroke({ width: 1 });
+  var forceLine = svg.line(0,forceLineY,0,forceLineY).stroke({width:5, color: '#f00'});
   updateSlot(defaultSlot);
 
   $('#target-pos').attr({ min : 0, max : slots.length, step: 1 });
   $('#target-pos').change(function() {
     updateSlot($(this).val());
+  });
+
+  $('#draw-force').change(function() {
+    arrowEnd = origArrowEnd + parseInt($(this).val(),10);
+    if (arrowEnd > forceLineY) {
+      // shoot arrow
+      var timeout;
+      var shootAnimator = function() {
+        console.log("shooting");
+        if (arrowEnd < target.cy()+5) {
+          clearTimeout(timeout);
+          return;
+        }
+        arrowEnd -= 2; 
+        updateSlot(currSlot);
+        timeout = setTimeout(shootAnimator,1);
+      }
+      timeout = setTimeout(shootAnimator, 1);
+    }
+    updateArrow(currSlot);
+  });
+
+  var aimedCircle = svg.circle(10).fill('red');
+  $('#draw-angle').change(function() {
+    var angle = $(this).val();
+    // perfect angle: 50
+    // angle: 0   -> bottom -> target.y() + 2*target.r()
+    // angle: 100 -> top    -> target.y()
+    aimedCircle.center(target.cx(), target.y() + ((angle/100)*(2*target.radius())));
   });
 
 });
