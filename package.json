@@ -8,6 +8,7 @@
   "dependencies": {
     "express": "3.3.7",
     "ejs": "*",
-    "node-sass": "*"
+    "node-sass": "*",
+    "socket.io": "~0.9.16"
   }
 }

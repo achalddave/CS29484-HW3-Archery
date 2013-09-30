@@ -6,12 +6,12 @@ SVG.Target = function(parent) {
   this.constructor.call(this, SVG.create('target'))
   // from largest to smallest
   this.rings = parent.doc().set();
-  this.stand = parent.rect(0,0).center(0,0).attr({fill : '#AD871C'});
+  this.stand = parent.rect(0,0).center(0,0).fill('#732800').stroke({color: 'black', width: 5});
 
   var self = this;
   this.colors.forEach(function(color) {
     self.rings.add(parent.circle(0)
-                      .attr({fill : color, stroke : '#000'}));
+                      .fill(color).stroke('#000'));
   });
 
   var gradient = parent.gradient('radial', function(stop) {
@@ -53,6 +53,7 @@ SVG.Target.prototype = new SVG.Shape();
 SVG.extend(SVG.Target, {
   // from largest to smallest
   colors: ['#eee', 'black', 'blue', 'red', 'yellow', 'yellow'],
+  scores: [1, 3, 5, 7, 9, 10],
   repositionStand: function() {
     this.stand.cx(this.gradientRing.cx());
     // not a typo, align top with center
@@ -62,7 +63,7 @@ SVG.extend(SVG.Target, {
     var currDiameter = 2*r;
     var step = 2*r / this.colors.length;
 
-    this.stand.size(1.3*r, 1.3*r);
+    this.stand.size(1.3*r, 1.2*r);
     this.gradientRing.size(2*r, 2*r);
     this.repositionStand();
 
@@ -78,6 +79,19 @@ SVG.extend(SVG.Target, {
   },
   placeGround: function(cx, by) {
     return this.cx(cx).y(by - this.stand.attr('height') - this.gradientRing.attr('ry'));
+  },
+  getScore: function(hitX, hitY) {
+    var xDiff = hitX - this.cx(), yDiff = hitY - this.cy();
+    var r = Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
+    console.log(r);
+    for (var i = this.rings.members.length - 1; i >= 0; --i) {
+      console.log(this.rings.members[i].attr('rx'));
+      if (this.rings.members[i].attr('rx') >= r) {
+        console.log("Hit ring #",i);
+        return this.scores[i];
+      }
+    }
+    return 0;
   }
 });
 
@@ -85,13 +99,17 @@ SVG.Arrow = function(parent) {
   this.constructor.call(this, SVG.create('arrow'));
 
   this.arrowGroup = parent.group();
-  this.arrowLine = parent.line(0,0,0,0).stroke({width:2});
-  this.arrowHead = parent.polygon('').stroke('black').fill('none');
-  this.arrowHead1 = parent.polyline('').stroke('black').fill('none');
-  this.arrowHead2 = parent.polyline('').stroke('black').fill('none');
-  this.arrowHead3 = parent.polyline('').stroke('black').fill('none');
-  this.arrowGroup.add(this.arrowLine).add(this.arrowHead).add(this.arrowHead1)
-                 .add(this.arrowHead2).add(this.arrowHead3);
+  this.arrowLine = parent.line(0,0,0,0).stroke({width:2, color : 'darkred'});
+  this.arrowHead = parent.polygon('').stroke('white').fill('darkred');
+  this.arrowHead1 = parent.polyline('').stroke('white').fill('none');
+  this.arrowHead2 = parent.polyline('').stroke('white').fill('none');
+  this.arrowHead3 = parent.polyline('').stroke('white').fill('none');
+  this.fletching1 = parent.polyline('').stroke('white').fill('none');
+  this.fletching2 = parent.polyline('').stroke('white').fill('none');
+  this.fletching3 = parent.polyline('').stroke('white').fill('none');
+  this.arrowGroup.add(this.arrowLine).add(this.arrowHead)
+                  .add(this.arrowHead1).add(this.arrowHead2).add(this.arrowHead3)
+                  .add(this.fletching1).add(this.fletching2).add(this.fletching3);
 }
 
 SVG.Arrow.prototype = new SVG.Shape();
@@ -115,22 +133,36 @@ SVG.extend(SVG.Arrow, {
     if (w == null) { w = this.w; } else { this.w = w; }
     if (h == null) { h = this.h; } else { this.h = h; }
 
-    var cx = this.arrowLine.attr('x2'), by = this.arrowLine.attr('y2');
-    this.arrowHead.plot([[cx - w/2, by+(h/3)],
-                         [cx, by-(2*h/3)],
-                         [cx + w/2, by+(h/3)],
-                         [cx, by]]);
-    this.arrowHead1.plot([[cx-2*w/5, by+(2*h/3)],
-                          [cx, by+(h/3)],
-                          [cx+2*w/5, by+(2*h/3)]
+    var cx = this.arrowLine.attr('x2');
+    var ty = this.arrowLine.attr('y2');
+    var by = this.arrowLine.attr('y1');
+    this.arrowHead.plot([[cx - w/2, ty+(h/3)],
+                         [cx, ty-(2*h/3)],
+                         [cx + w/2, ty+(h/3)],
+                         [cx, ty]]);
+    this.arrowHead1.plot([[cx-2*w/5, ty+(2*h/3)],
+                          [cx, ty+(h/3)],
+                          [cx+2*w/5, ty+(2*h/3)]
                           ]);
-    this.arrowHead2.plot([[cx-w/3, by+(h)],
-                          [cx, by+(2*h/3)],
-                          [cx+w/3, by+(h)]
+    this.arrowHead2.plot([[cx-w/3, ty+(h)],
+                          [cx, ty+(2*h/3)],
+                          [cx+w/3, ty+(h)]
                           ]);
-    this.arrowHead3.plot([[cx-w/4, by+(h)],
-                          [cx, by+(2*h/3)],
-                          [cx+w/4, by+(h)]
+    this.arrowHead3.plot([[cx-w/4, ty+(h)],
+                          [cx, ty+(2*h/3)],
+                          [cx+w/4, ty+(h)]
+                          ]);
+    this.fletching1.plot([[cx-2*w/5, by-(h/3)],
+                          [cx, by-(2*h/3)],
+                          [cx+2*w/5, by-(h/3)]
+                          ]);
+    this.fletching2.plot([[cx-2*w/5, by-(2*h/3)],
+                          [cx, by-(h)],
+                          [cx+2*w/5, by-(2*h/3)]
+                          ]);
+    this.fletching3.plot([[cx-2*w/5, by-(2*h/3)],
+                          [cx, by-(h)],
+                          [cx+2*w/5, by-(2*h/3)]
                           ]);
     return this;
   }
