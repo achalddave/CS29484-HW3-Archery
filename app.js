@@ -81,12 +81,28 @@ bow.on(bow.events.shoot, function() {
   socket.emit('shoot');
 });
 
+var previousTilt = null;
+var alpha = 0.5;
 bow.on(bow.events.tilt, function(tilt) {
-  console.log("Tilt in app.js ", tilt);
-  socket.emit('tilt', tilt);
+  if (previousTilt) {
+    previousTilt = alpha*tilt + (1 - alpha)*previousTilt;
+  } else {
+    previousTilt = tilt;
+  }
+  socket.emit('tilt', previousTilt);
 });
 
+var recentForces = [];
 bow.on(bow.events.force, function(force) {
-  console.log("Force in app.js", force);
-  socket.emit('force', force);
+  recentForces.push(force);
+  if (recentForces.length > 50) {
+    // remove first index
+    recentForces.splice(0,1);
+  }
+  var max = recentForces[0];
+  recentForces.forEach(function(val) {
+    if (val > max) max = val;
+  })
+  console.log("Force in app.js", max);
+  socket.emit('force', max);
 });

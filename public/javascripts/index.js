@@ -64,7 +64,9 @@ $(function() {
       x2 : slots[currSlot].center + 50
     });
     if (pulledPos > forceLine.attr('y1')) {
-      forceLine.stroke('#26FF00');
+      enoughForce = true;
+    } else {
+      enoughForce = false;
     }
   }
 
@@ -89,6 +91,7 @@ $(function() {
   var currForce    = 0;
   var arrowEnd     = h - (h - slots[0].bottom)/2;
   var forceLineY   = h - (h - slots[0].bottom)/4;
+  var enoughForce  = false;
 
   var target      = svg.target(40);
   var arrow       = svg.arrow(0,h,0,arrowEnd);
@@ -167,7 +170,8 @@ $(function() {
   });
 
   socket.on('shoot', function() {
-    shoot();
+    if (currSlot == targetSlot && enoughForce)
+      shoot();
   });
 
   socket.on('tilt', function(tilt) {
@@ -180,6 +184,9 @@ $(function() {
     console.log("Force: ", force);
     currForce = force;
     updateArrow();
+    if (enoughForce) {
+      forceLine.stroke('#26FF00');
+    }
   });
 
   socket.on('reset', function() {
