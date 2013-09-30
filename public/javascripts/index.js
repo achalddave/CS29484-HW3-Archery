@@ -71,7 +71,7 @@ $(function() {
   }
 
   function updateAimedCircle() {
-    aimedCircle.center(target.cx(), target.y() + ((currAngle)*(2*target.radius())));
+    aimedCircle.center(slots[currSlot].center, target.y() + ((currAngle)*(2*target.radius())));
   }
 
   function reset() {
@@ -186,6 +186,8 @@ $(function() {
     updateArrow();
     if (enoughForce) {
       forceLine.stroke('#26FF00');
+    } else {
+      forceLine.stroke('lightgray');
     }
   });
 

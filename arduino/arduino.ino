@@ -56,7 +56,7 @@ void loop() {
     } 
   }
 
-  if (buttonClicked && (analogRead(0) > 100)) { 
+  if (analogRead(0) > 100) { 
 
     cableDrawn = 1; 
     // cable is drawn 
@@ -113,5 +113,3 @@ void loop() {
   }
 
 } 
-
-
