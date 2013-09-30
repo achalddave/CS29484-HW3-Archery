@@ -4,6 +4,7 @@ var config = {
   debug : false
 }
 
+
 $(function() {
   var svg = SVG('game');
   var w = $('#game').width(), h = $('#game').height();
@@ -54,14 +55,32 @@ $(function() {
 
   function updateArrow() {
     arrow.plot(slots[currSlot].center, null, slots[currSlot].center, null);
+    var pulledPos = arrowEnd - (arrowEnd - h)*(currForce);
+    arrow.arrowGroup.transform({
+      y : pulledPos - arrow.arrowLine.attr('y2')
+    });
     forceLine.attr({
       x1 : slots[currSlot].center - 50,
       x2 : slots[currSlot].center + 50
-    })
+    });
+    if (pulledPos > forceLine.attr('y1')) {
+      forceLine.stroke('#26FF00');
+    }
   }
 
   function updateAimedCircle() {
-    aimedCircle.center(target.cx(), target.y() + ((currAngle/100)*(2*target.radius())));
+    aimedCircle.center(target.cx(), target.y() + ((currAngle)*(2*target.radius())));
+  }
+
+  function reset() {
+    /* FIXME */   
+    updateTargetSlot(Math.floor(Math.random() * slots.length));
+    currAngle = 0;
+    currForce = 0;
+    arrow.arrowGroup.transform({y: 0});
+    forceLine.stroke('lightgray');
+    updateSlot(currSlot);
+    updateAimedCircle();
   }
 
   var currSlot     = Math.round(slots.length/2-0.5);
@@ -106,7 +125,13 @@ $(function() {
         weight:'lighter',
         family: 'Segoe UI'
       });
+    setTimeout(function() {
+      svgText.remove();
+      reset();
+    }, 2000);
   }
+
+  $('#shoot').click(function() { shoot(); });
 
   $('#arrow-pos').attr({ min : 0, max : slots.length, step: 1 });
   $('#arrow-pos').change(function() {
@@ -116,25 +141,13 @@ $(function() {
   updateTargetSlot(targetSlot);
 
   $('#draw-force').change(function() {
-    var pulled = parseInt($(this).val(), 10);
-    /* starting at h+pulled shows up the same as starting at h, but allows us
-     * to translate while keeping the length constant when shooting */
-    var newPos = arrowEnd - (arrowEnd - h)*(pulled/100);
-    arrow.arrowGroup.transform({
-      // 0: (arrowEnd)
-      // 100: h
-      y : newPos - arrow.arrowLine.attr('y2')
-    });
-    if (newPos > forceLineY) {
-      forceLine.stroke('#1AFF00');
-      shoot();
-      return;
-    }
+    currForce = $(this).val() / 100;
+    updateArrow();
   });
   $('#draw-force').val(0).change();
 
   $('#draw-angle').change(function() {
-    currAngle = $(this).val();
+    currAngle = ($(this).val())/100;
     // perfect angle: 50
     // angle: 0   -> bottom -> target.y() + 2*target.r()
     // angle: 100 -> top    -> target.y()
@@ -142,15 +155,14 @@ $(function() {
   });
   $('#draw-angle').val(currAngle).change();
 
-  var socket = io.connect('http://localhost:8000');
-  socket.on('connected', function(text) { alert(text); });
+  var socket = io.connect('http://localhost:7000');
 
   socket.on('arrowLeft', function() {
     // % operator in JS allows negative, so can't use it
     updateSlot(currSlot == 0 ? slots.length - 1 : currSlot - 1);
   });
 
-  socket.on('arrowLeft', function() {
+  socket.on('arrowRight', function() {
     updateSlot((currSlot + 1) % slots.length);
   });
 
@@ -159,13 +171,19 @@ $(function() {
   });
 
   socket.on('tilt', function(tilt) {
+    console.log("Tilt: ", tilt);
     currAngle = tilt;
     updateAimedCircle();
   });
 
   socket.on('force', function(force) {
+    console.log("Force: ", force);
     currForce = force;
     updateArrow();
+  });
+
+  socket.on('reset', function() {
+    reset();
   });
 
 });

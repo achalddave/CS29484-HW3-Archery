@@ -11,7 +11,7 @@
 
   width  : 800px;
   height : 500px;
-  box-shadow : 0px 0px 20px 2px darken($bg, 20%);
+  box-shadow : 0px 0px 20px 2px unquote("darken($bg, 20%)");
 }
 
 #controls {

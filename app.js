@@ -7,14 +7,15 @@ var express = require('express'),
     http    = require('http'),
     path    = require('path'),
     sass    = require('node-sass'),
-    io      = require('socket.io').listen(8000),
+    io      = require('socket.io').listen(7000),
     routes  = require('./routes'),
-    monitor = require('./monitor');
+    monitor = require('./monitor'),
+    socket = null;
 
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 7070);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon());
@@ -41,14 +42,34 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-io.sockets.on('connection', function (socket) {
+io.sockets.on('connection', function (currSocket) {
+  socket = currSocket;
   socket.emit('connected', "Hello!");
+  /*
+  setTimeout(function() {
+    socket.emit('arrowLeft');
+    setTimeout(function() {
+      socket.emit('arrowRight');
+      setTimeout(function() {
+        socket.emit('force', 0.7);
+        setTimeout(function() {
+          socket.emit('tilt', 0.3);
+          setTimeout(function() {
+            socket.emit('shoot', 0.7);
+          }, 3000)
+        }, 1000)
+      }, 1000);
+    }, 1000)
+  }, 1000)
+  */
 });
 
 // monitor
-var bow = new monitor.Monitor('COM5');
+var bow = new monitor.Monitor('COM6');
+bow.listen();
 
 bow.on(bow.events.arrowLeft, function() {
+  console.log("Emitting arrow left");
   socket.emit('arrowLeft');
 });
 
@@ -61,9 +82,11 @@ bow.on(bow.events.shoot, function() {
 });
 
 bow.on(bow.events.tilt, function(tilt) {
+  console.log("Tilt in app.js ", tilt);
   socket.emit('tilt', tilt);
 });
 
 bow.on(bow.events.force, function(force) {
+  console.log("Force in app.js", force);
   socket.emit('force', force);
 });

@@ -3,7 +3,7 @@
   <head>
     <title><%= title %></title>
     <link rel="stylesheet" href="/stylesheets/index.css" />
-    <script src="http://localhost:8000/socket.io/socket.io.js"></script>
+    <script src="http://localhost:7000/socket.io/socket.io.js"></script>
     <script src="javascripts/lib/svg.js/dist/svg.js"></script>
     <script src="javascripts/lib/jquery/jquery.min.js"></script>
     <script src="javascripts/svg.archer.js"></script>
@@ -26,6 +26,7 @@
         <label for="draw-force">Draw force</label>
         <input type="range" value="0" id="draw-force"/>
       </div>
+      <input type="button" id="shoot" value="Shoot!" />
     </div>
   </body>
 </html>
