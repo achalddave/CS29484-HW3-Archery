@@ -81,28 +81,41 @@ bow.on(bow.events.shoot, function() {
   socket.emit('shoot');
 });
 
-var previousTilt = null;
-var alpha = 0.5;
-bow.on(bow.events.tilt, function(tilt) {
-  if (previousTilt) {
-    previousTilt = alpha*tilt + (1 - alpha)*previousTilt;
+function MedianFilter(numPoints) {
+  this.values = new Array(numPoints);
+  this.filledVales = 0;
+}
+
+MedianFilter.prototype.insert = function(val) {
+  if (this.filledValues < this.values.length) {
+    this.values.splice(0,0,val);
+    this.filledValues++;
+    return val;
   } else {
-    previousTilt = tilt;
+    this.values.splice(0,0,val);
+    this.values.pop();
+    return this.median();
   }
-  socket.emit('tilt', previousTilt);
+}
+
+MedianFilter.prototype.median = function() {
+  // only called if filled
+  var sorted = this.values.slice().sort();
+  if (sorted.length % 2 == 0) 
+    return (sorted[sorted.length / 2] + sorted[sorted.length / 2 - 1])/2;
+  else
+    return (sorted[sorted.length / 2 - 0.5]);
+}
+
+var tilts = new MedianFilter(9);
+bow.on(bow.events.tilt, function(tilt) {
+  tilt = tilts.insert(tilt);
+  socket.emit('tilt', tilt);
 });
 
-var recentForces = [];
+var forces = new MedianFilter(50);
 bow.on(bow.events.force, function(force) {
-  recentForces.push(force);
-  if (recentForces.length > 50) {
-    // remove first index
-    recentForces.splice(0,1);
-  }
-  var max = recentForces[0];
-  recentForces.forEach(function(val) {
-    if (val > max) max = val;
-  })
-  console.log("Force in app.js", max);
-  socket.emit('force', max);
+  force = forces.insert(force);
+  console.log("Force in app.js", force);
+  socket.emit('force', force);
 });
